@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "webserver.h"
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -168,7 +169,13 @@ void webserver_stop(webserver_t* server) {
     }
     
     server->is_running = 0;
-    close(server->socket_fd);
+    
+    // Shutdown the socket to wake up accept()
+    if (server->socket_fd >= 0) {
+        shutdown(server->socket_fd, SHUT_RDWR);
+        close(server->socket_fd);
+    }
+    
     pthread_join(server->server_thread, NULL);
     
     printf("Web server stopped\n");

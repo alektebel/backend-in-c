@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "http_parser.h"
 #include <ctype.h>
 
@@ -104,7 +105,7 @@ int http_request_parse(http_request_t* request, const char* raw_request, size_t 
         size_t count = 0;
         while (current < headers_end) {
             const char* next = strstr(current, "\r\n");
-            if (!next || next >= headers_end) break;
+            if (!next || next > headers_end) break;
             count++;
             current = next + 2;
         }
@@ -117,7 +118,7 @@ int http_request_parse(http_request_t* request, const char* raw_request, size_t 
             size_t idx = 0;
             while (current < headers_end && idx < count) {
                 const char* next = strstr(current, "\r\n");
-                if (!next || next >= headers_end) break;
+                if (!next || next > headers_end) break;
                 
                 const char* colon = strchr(current, ':');
                 if (colon && colon < next) {

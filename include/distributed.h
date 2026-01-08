@@ -33,6 +33,7 @@ void auth_token_destroy(auth_token_t* token);
 int auth_token_validate(const auth_token_t* token);
 char* auth_token_serialize(const auth_token_t* token);
 auth_token_t* auth_token_deserialize(const char* token_str);
+const char* auth_token_get_user_id(const auth_token_t* token);
 
 // Rate limiting
 typedef struct rate_limiter rate_limiter_t;

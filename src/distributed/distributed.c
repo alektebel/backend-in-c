@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "distributed.h"
 #include <pthread.h>
 
@@ -211,6 +212,10 @@ auth_token_t* auth_token_deserialize(const char* token_str) {
     token->created_at = created_at;
     token->ttl_seconds = ttl_seconds;
     return token;
+}
+
+const char* auth_token_get_user_id(const auth_token_t* token) {
+    return token ? token->user_id : NULL;
 }
 
 // Rate limiter implementation

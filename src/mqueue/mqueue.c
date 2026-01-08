@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "mqueue.h"
 #include <pthread.h>
 
@@ -76,7 +77,7 @@ static void message_destroy(message_t* msg) {
     safe_free((void**)&msg);
 }
 
-static void enqueue_message(mqueue_t* queue, message_node_t* node) {
+static void enqueue_message(mqueue_t* queue, queue_node_t* node) {
     if (queue->ordering == ORDERING_PRIORITY) {
         // Insert based on priority
         queue_node_t* current = queue->head;
@@ -292,6 +293,8 @@ int mqueue_unsubscribe(consumer_t* consumer) {
 
 int mqueue_acknowledge(mqueue_t* queue, const char* message_id) {
     // Placeholder for acknowledgment logic
+    (void)queue;
+    (void)message_id;
     return SUCCESS;
 }
 
@@ -299,6 +302,8 @@ int mqueue_reject(mqueue_t* queue, const char* message_id, bool requeue) {
     if (!queue || !message_id) {
         return ERROR_INVALID_PARAM;
     }
+    
+    (void)requeue;  // Placeholder for requeue logic
     
     pthread_mutex_lock(&queue->lock);
     queue->total_rejected++;

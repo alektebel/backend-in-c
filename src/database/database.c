@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "database.h"
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -393,11 +394,16 @@ int transaction_delete(transaction_t* txn, const char* key) {
 
 int database_create_index(database_t* db, const char* index_name, index_type_t type) {
     // Placeholder for index creation
+    (void)db;
+    (void)index_name;
+    (void)type;
     return SUCCESS;
 }
 
 int database_drop_index(database_t* db, const char* index_name) {
     // Placeholder for index removal
+    (void)db;
+    (void)index_name;
     return SUCCESS;
 }
 
@@ -441,6 +447,7 @@ int database_recover(database_t* db) {
 
 int database_compact(database_t* db) {
     // Placeholder for compaction logic
+    (void)db;
     return SUCCESS;
 }
 
