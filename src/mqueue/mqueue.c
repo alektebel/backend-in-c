@@ -150,7 +150,11 @@ static void* consumer_thread(void* arg) {
             // Check if topic matches
             if (strcmp(node->message->topic, consumer->topic) == 0) {
                 consumer->handler(node->message, consumer->user_data);
+                
+                // Update counter with proper locking
+                pthread_mutex_lock(&queue->lock);
                 queue->total_consumed++;
+                pthread_mutex_unlock(&queue->lock);
             } else {
                 // Re-queue if topic doesn't match
                 pthread_mutex_lock(&queue->lock);
@@ -242,13 +246,19 @@ consumer_t* mqueue_subscribe(mqueue_t* queue, const char* topic,
     consumer->queue = queue;
     consumer->active = 1;
     
+    // Create thread before adding to list
+    if (pthread_create(&consumer->thread, NULL, consumer_thread, consumer) != 0) {
+        perror("pthread_create failed");
+        safe_free((void**)&consumer->topic);
+        safe_free((void**)&consumer);
+        return NULL;
+    }
+    
     pthread_mutex_lock(&queue->lock);
     consumer->next = queue->consumers;
     queue->consumers = consumer;
     queue->consumer_count++;
     pthread_mutex_unlock(&queue->lock);
-    
-    pthread_create(&consumer->thread, NULL, consumer_thread, consumer);
     
     return consumer;
 }

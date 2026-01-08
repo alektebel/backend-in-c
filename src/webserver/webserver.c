@@ -78,7 +78,12 @@ static void* server_loop(void* arg) {
         ctx->server = server;
         
         pthread_t thread;
-        pthread_create(&thread, NULL, handle_client, ctx);
+        if (pthread_create(&thread, NULL, handle_client, ctx) != 0) {
+            perror("pthread_create failed");
+            close(client_fd);
+            free(ctx);
+            continue;
+        }
         pthread_detach(thread);
     }
     
