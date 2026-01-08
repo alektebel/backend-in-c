@@ -1,0 +1,29 @@
+# Build artifacts
+build/
+*.o
+*.a
+*.so
+*.dylib
+
+# Executables
+test_*
+bench_*
+
+# Database files
+*.db
+*.log
+*.wal
+/tmp/
+
+# Editor files
+*.swp
+*.swo
+*~
+.DS_Store
+.vscode/
+.idea/
+
+# Debug files
+*.dSYM/
+core
+core.*
