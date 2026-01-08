@@ -198,11 +198,12 @@ char* auth_token_serialize(const auth_token_t* token) {
 }
 
 auth_token_t* auth_token_deserialize(const char* token_str) {
-    if (!token_str) return NULL;
+    if (!token_str || strlen(token_str) > 256) return NULL;
     
     char user_id[128];
     uint64_t created_at, ttl_seconds;
     
+    // sscanf with %127[^:] is safe as it limits to 127 chars + null terminator
     if (sscanf(token_str, "%127[^:]:%lu:%lu", user_id, &created_at, &ttl_seconds) != 3) {
         return NULL;
     }

@@ -48,10 +48,16 @@ struct mqueue {
 };
 
 static char* generate_message_id(void) {
+    static pthread_mutex_t id_lock = PTHREAD_MUTEX_INITIALIZER;
     static uint64_t counter = 0;
-    char* id = safe_malloc(MAX_MESSAGE_ID);
-    snprintf(id, MAX_MESSAGE_ID, "msg-%lu-%lu", get_timestamp_ms(), counter++);
-    return id;
+    
+    pthread_mutex_lock(&id_lock);
+    uint64_t id = counter++;
+    pthread_mutex_unlock(&id_lock);
+    
+    char* result = safe_malloc(MAX_MESSAGE_ID);
+    snprintf(result, MAX_MESSAGE_ID, "msg-%lu-%lu", get_timestamp_ms(), id);
+    return result;
 }
 
 static message_t* message_create(const char* topic, const void* payload, 

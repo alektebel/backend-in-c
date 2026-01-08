@@ -132,7 +132,11 @@ int webserver_start(webserver_t* server) {
     
     // Set socket options
     int opt = 1;
-    setsockopt(server->socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    if (setsockopt(server->socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("setsockopt failed");
+        close(server->socket_fd);
+        return ERROR_IO;
+    }
     
     // Bind socket
     struct sockaddr_in server_addr;

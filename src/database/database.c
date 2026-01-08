@@ -411,8 +411,15 @@ int database_checkpoint(database_t* db) {
     if (!db || db->wal_fd < 0) return ERROR_INVALID_PARAM;
     
     // Truncate WAL after checkpoint
-    ftruncate(db->wal_fd, 0);
-    lseek(db->wal_fd, 0, SEEK_SET);
+    if (ftruncate(db->wal_fd, 0) < 0) {
+        perror("ftruncate failed");
+        return ERROR_IO;
+    }
+    
+    if (lseek(db->wal_fd, 0, SEEK_SET) < 0) {
+        perror("lseek failed");
+        return ERROR_IO;
+    }
     
     return SUCCESS;
 }
