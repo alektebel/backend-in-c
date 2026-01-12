@@ -33,13 +33,20 @@ TESTING_SRC = $(SRC_DIR)/testing/testing.c
 CONTAINER_SRC = $(SRC_DIR)/container/container.c
 CICD_SRC = $(SRC_DIR)/cicd/cicd.c
 CLOUD_SRC = $(SRC_DIR)/cloud/cloud.c
+DB_PERFORMANCE_SRC = $(SRC_DIR)/db_performance/db_performance.c
+CACHE_STRATEGIES_SRC = $(SRC_DIR)/cache_strategies/cache_strategies.c
+CONCURRENCY_SRC = $(SRC_DIR)/concurrency/concurrency.c
+NETWORK_SERIALIZATION_SRC = $(SRC_DIR)/network_serialization/network_serialization.c
+LATENCY_OBSERVABILITY_SRC = $(SRC_DIR)/latency_observability/latency_observability.c
 
 ALL_SRC = $(COMMON_SRC) $(HTTP_SRC) $(WEBSERVER_SRC) $(DATABASE_SRC) \
           $(CACHE_SRC) $(MQUEUE_SRC) $(DISTRIBUTED_SRC) $(HTTP_STATUS_SRC) \
           $(AUTH_SRC) $(CRYPTO_SRC) $(SECURITY_SRC) $(WEBSOCKET_SRC) \
           $(SQL_SRC) $(NOSQL_SRC) $(ARCHITECTURE_SRC) $(SCALING_SRC) \
           $(LOGGING_SRC) $(MONITORING_SRC) $(TRACING_SRC) $(TESTING_SRC) \
-          $(CONTAINER_SRC) $(CICD_SRC) $(CLOUD_SRC)
+          $(CONTAINER_SRC) $(CICD_SRC) $(CLOUD_SRC) $(DB_PERFORMANCE_SRC) \
+          $(CACHE_STRATEGIES_SRC) $(CONCURRENCY_SRC) $(NETWORK_SERIALIZATION_SRC) \
+          $(LATENCY_OBSERVABILITY_SRC)
 
 # Object files
 COMMON_OBJ = $(BUILD_DIR)/common.o
@@ -65,13 +72,20 @@ TESTING_OBJ = $(BUILD_DIR)/testing.o
 CONTAINER_OBJ = $(BUILD_DIR)/container.o
 CICD_OBJ = $(BUILD_DIR)/cicd.o
 CLOUD_OBJ = $(BUILD_DIR)/cloud.o
+DB_PERFORMANCE_OBJ = $(BUILD_DIR)/db_performance.o
+CACHE_STRATEGIES_OBJ = $(BUILD_DIR)/cache_strategies.o
+CONCURRENCY_OBJ = $(BUILD_DIR)/concurrency.o
+NETWORK_SERIALIZATION_OBJ = $(BUILD_DIR)/network_serialization.o
+LATENCY_OBSERVABILITY_OBJ = $(BUILD_DIR)/latency_observability.o
 
 ALL_OBJ = $(COMMON_OBJ) $(HTTP_OBJ) $(WEBSERVER_OBJ) $(DATABASE_OBJ) \
           $(CACHE_OBJ) $(MQUEUE_OBJ) $(DISTRIBUTED_OBJ) $(HTTP_STATUS_OBJ) \
           $(AUTH_OBJ) $(CRYPTO_OBJ) $(SECURITY_OBJ) $(WEBSOCKET_OBJ) \
           $(SQL_OBJ) $(NOSQL_OBJ) $(ARCHITECTURE_OBJ) $(SCALING_OBJ) \
           $(LOGGING_OBJ) $(MONITORING_OBJ) $(TRACING_OBJ) $(TESTING_OBJ) \
-          $(CONTAINER_OBJ) $(CICD_OBJ) $(CLOUD_OBJ)
+          $(CONTAINER_OBJ) $(CICD_OBJ) $(CLOUD_OBJ) $(DB_PERFORMANCE_OBJ) \
+          $(CACHE_STRATEGIES_OBJ) $(CONCURRENCY_OBJ) $(NETWORK_SERIALIZATION_OBJ) \
+          $(LATENCY_OBSERVABILITY_OBJ)
 
 # Test executables
 TEST_HTTP = $(BUILD_DIR)/test_http
@@ -83,11 +97,14 @@ TEST_DISTRIBUTED = $(BUILD_DIR)/test_distributed
 TEST_HTTP_STATUS = $(BUILD_DIR)/test_http_status
 TEST_AUTH = $(BUILD_DIR)/test_auth
 TEST_CRYPTO = $(BUILD_DIR)/test_crypto
-TEST_SECURITY = $(BUILD_DIR)/test_security
+TEST_DB_PERFORMANCE = $(BUILD_DIR)/test_db_performance
+TEST_CACHE_STRATEGIES = $(BUILD_DIR)/test_cache_strategies
+TEST_CONCURRENCY = $(BUILD_DIR)/test_concurrency
+TEST_NETWORK_SERIALIZATION = $(BUILD_DIR)/test_network_serialization
+TEST_LATENCY_OBSERVABILITY = $(BUILD_DIR)/test_latency_observability
 
-ALL_TESTS = $(TEST_HTTP) $(TEST_WEBSERVER) $(TEST_DATABASE) $(TEST_CACHE) \
-            $(TEST_MQUEUE) $(TEST_DISTRIBUTED) $(TEST_HTTP_STATUS) $(TEST_AUTH) \
-            $(TEST_CRYPTO) $(TEST_SECURITY)
+ALL_TESTS = $(TEST_DB_PERFORMANCE) $(TEST_CACHE_STRATEGIES) $(TEST_CONCURRENCY) \
+            $(TEST_NETWORK_SERIALIZATION) $(TEST_LATENCY_OBSERVABILITY)
 
 # Benchmark executables
 BENCH_HTTP = $(BUILD_DIR)/bench_http
@@ -97,10 +114,14 @@ BENCH_MQUEUE = $(BUILD_DIR)/bench_mqueue
 BENCH_HTTP_STATUS = $(BUILD_DIR)/bench_http_status
 BENCH_AUTH = $(BUILD_DIR)/bench_auth
 BENCH_CRYPTO = $(BUILD_DIR)/bench_crypto
-BENCH_SECURITY = $(BUILD_DIR)/bench_security
+BENCH_DB_PERFORMANCE = $(BUILD_DIR)/bench_db_performance
+BENCH_CACHE_STRATEGIES = $(BUILD_DIR)/bench_cache_strategies
+BENCH_CONCURRENCY = $(BUILD_DIR)/bench_concurrency
+BENCH_NETWORK_SERIALIZATION = $(BUILD_DIR)/bench_network_serialization
+BENCH_LATENCY_OBSERVABILITY = $(BUILD_DIR)/bench_latency_observability
 
-ALL_BENCHMARKS = $(BENCH_HTTP) $(BENCH_DATABASE) $(BENCH_CACHE) $(BENCH_MQUEUE) \
-                 $(BENCH_HTTP_STATUS) $(BENCH_AUTH) $(BENCH_CRYPTO) $(BENCH_SECURITY)
+ALL_BENCHMARKS = $(BENCH_DB_PERFORMANCE) $(BENCH_CACHE_STRATEGIES) $(BENCH_CONCURRENCY) \
+                 $(BENCH_NETWORK_SERIALIZATION) $(BENCH_LATENCY_OBSERVABILITY)
 
 .PHONY: all clean test benchmark
 
@@ -180,63 +201,53 @@ $(CICD_OBJ): $(CICD_SRC) $(INCLUDE_DIR)/cicd.h $(INCLUDE_DIR)/common.h
 $(CLOUD_OBJ): $(CLOUD_SRC) $(INCLUDE_DIR)/cloud.h $(INCLUDE_DIR)/common.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Build tests
-$(TEST_HTTP): $(TEST_DIR)/test_http.c $(COMMON_OBJ) $(HTTP_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(HTTP_OBJ) -o $@ $(LDFLAGS)
+# New performance optimization modules
+$(DB_PERFORMANCE_OBJ): $(DB_PERFORMANCE_SRC) $(INCLUDE_DIR)/db_performance.h $(INCLUDE_DIR)/common.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TEST_WEBSERVER): $(TEST_DIR)/test_webserver.c $(COMMON_OBJ) $(HTTP_OBJ) $(WEBSERVER_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(HTTP_OBJ) $(WEBSERVER_OBJ) -o $@ $(LDFLAGS)
+$(CACHE_STRATEGIES_OBJ): $(CACHE_STRATEGIES_SRC) $(INCLUDE_DIR)/cache_strategies.h $(INCLUDE_DIR)/common.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TEST_DATABASE): $(TEST_DIR)/test_database.c $(COMMON_OBJ) $(DATABASE_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(DATABASE_OBJ) -o $@ $(LDFLAGS)
+$(CONCURRENCY_OBJ): $(CONCURRENCY_SRC) $(INCLUDE_DIR)/concurrency.h $(INCLUDE_DIR)/common.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TEST_CACHE): $(TEST_DIR)/test_cache.c $(COMMON_OBJ) $(CACHE_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(CACHE_OBJ) -o $@ $(LDFLAGS)
+$(NETWORK_SERIALIZATION_OBJ): $(NETWORK_SERIALIZATION_SRC) $(INCLUDE_DIR)/network_serialization.h $(INCLUDE_DIR)/common.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TEST_MQUEUE): $(TEST_DIR)/test_mqueue.c $(COMMON_OBJ) $(MQUEUE_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(MQUEUE_OBJ) -o $@ $(LDFLAGS)
+$(LATENCY_OBSERVABILITY_OBJ): $(LATENCY_OBSERVABILITY_SRC) $(INCLUDE_DIR)/latency_observability.h $(INCLUDE_DIR)/common.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TEST_DISTRIBUTED): $(TEST_DIR)/test_distributed.c $(COMMON_OBJ) $(DISTRIBUTED_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(DISTRIBUTED_OBJ) -o $@ $(LDFLAGS)
+# Build tests - Performance optimization modules
+$(TEST_DB_PERFORMANCE): $(TEST_DIR)/test_db_performance.c $(COMMON_OBJ) $(DB_PERFORMANCE_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(DB_PERFORMANCE_OBJ) -o $@ $(LDFLAGS)
 
-# New module tests
-$(TEST_HTTP_STATUS): $(TEST_DIR)/test_http_status.c $(COMMON_OBJ) $(HTTP_STATUS_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(HTTP_STATUS_OBJ) -o $@ $(LDFLAGS)
+$(TEST_CACHE_STRATEGIES): $(TEST_DIR)/test_cache_strategies.c $(COMMON_OBJ) $(CACHE_STRATEGIES_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(CACHE_STRATEGIES_OBJ) -o $@ $(LDFLAGS)
 
-$(TEST_AUTH): $(TEST_DIR)/test_auth.c $(COMMON_OBJ) $(AUTH_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(AUTH_OBJ) -o $@ $(LDFLAGS)
+$(TEST_CONCURRENCY): $(TEST_DIR)/test_concurrency.c $(COMMON_OBJ) $(CONCURRENCY_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(CONCURRENCY_OBJ) -o $@ $(LDFLAGS)
 
-$(TEST_CRYPTO): $(TEST_DIR)/test_crypto.c $(COMMON_OBJ) $(CRYPTO_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(CRYPTO_OBJ) -o $@ $(LDFLAGS)
+$(TEST_NETWORK_SERIALIZATION): $(TEST_DIR)/test_network_serialization.c $(COMMON_OBJ) $(NETWORK_SERIALIZATION_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(NETWORK_SERIALIZATION_OBJ) -o $@ $(LDFLAGS)
 
-$(TEST_SECURITY): $(TEST_DIR)/test_security.c $(COMMON_OBJ) $(SECURITY_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(SECURITY_OBJ) -o $@ $(LDFLAGS)
+$(TEST_LATENCY_OBSERVABILITY): $(TEST_DIR)/test_latency_observability.c $(COMMON_OBJ) $(LATENCY_OBSERVABILITY_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(LATENCY_OBSERVABILITY_OBJ) -o $@ $(LDFLAGS)
 
-# Build benchmarks
-$(BENCH_HTTP): $(BENCH_DIR)/bench_http.c $(COMMON_OBJ) $(HTTP_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(HTTP_OBJ) -o $@ $(LDFLAGS)
+# Build benchmarks - Performance optimization modules
+$(BENCH_DB_PERFORMANCE): $(BENCH_DIR)/bench_db_performance.c $(COMMON_OBJ) $(DB_PERFORMANCE_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(DB_PERFORMANCE_OBJ) -o $@ $(LDFLAGS)
 
-$(BENCH_DATABASE): $(BENCH_DIR)/bench_database.c $(COMMON_OBJ) $(DATABASE_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(DATABASE_OBJ) -o $@ $(LDFLAGS)
+$(BENCH_CACHE_STRATEGIES): $(BENCH_DIR)/bench_cache_strategies.c $(COMMON_OBJ) $(CACHE_STRATEGIES_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(CACHE_STRATEGIES_OBJ) -o $@ $(LDFLAGS)
 
-$(BENCH_CACHE): $(BENCH_DIR)/bench_cache.c $(COMMON_OBJ) $(CACHE_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(CACHE_OBJ) -o $@ $(LDFLAGS)
+$(BENCH_CONCURRENCY): $(BENCH_DIR)/bench_concurrency.c $(COMMON_OBJ) $(CONCURRENCY_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(CONCURRENCY_OBJ) -o $@ $(LDFLAGS)
 
-$(BENCH_MQUEUE): $(BENCH_DIR)/bench_mqueue.c $(COMMON_OBJ) $(MQUEUE_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(MQUEUE_OBJ) -o $@ $(LDFLAGS)
+$(BENCH_NETWORK_SERIALIZATION): $(BENCH_DIR)/bench_network_serialization.c $(COMMON_OBJ) $(NETWORK_SERIALIZATION_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(NETWORK_SERIALIZATION_OBJ) -o $@ $(LDFLAGS)
 
-# New module benchmarks
-$(BENCH_HTTP_STATUS): $(BENCH_DIR)/bench_http_status.c $(COMMON_OBJ) $(HTTP_STATUS_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(HTTP_STATUS_OBJ) -o $@ $(LDFLAGS)
-
-$(BENCH_AUTH): $(BENCH_DIR)/bench_auth.c $(COMMON_OBJ) $(AUTH_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(AUTH_OBJ) -o $@ $(LDFLAGS)
-
-$(BENCH_CRYPTO): $(BENCH_DIR)/bench_crypto.c $(COMMON_OBJ) $(CRYPTO_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(CRYPTO_OBJ) -o $@ $(LDFLAGS)
-
-$(BENCH_SECURITY): $(BENCH_DIR)/bench_security.c $(COMMON_OBJ) $(SECURITY_OBJ)
-	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(SECURITY_OBJ) -o $@ $(LDFLAGS)
+$(BENCH_LATENCY_OBSERVABILITY): $(BENCH_DIR)/bench_latency_observability.c $(COMMON_OBJ) $(LATENCY_OBSERVABILITY_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(LATENCY_OBSERVABILITY_OBJ) -o $@ $(LDFLAGS)
 
 # Run tests
 test: $(ALL_TESTS)
