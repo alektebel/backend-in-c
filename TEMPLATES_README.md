@@ -407,12 +407,7 @@ backend-in-c/
     ├── bench_network_serialization.c
     ├── bench_latency_observability.c
     └── bench_tcp_udp.c
-│   ├── concurrency/
-│   ├── network_serialization/
-│   └── latency_observability/
-├── tests/                # Test suites
-│   ├── test_db_performance.c
-│   ├── test_cache_strategies.c
+```
 │   ├── test_concurrency.c
 │   ├── test_network_serialization.c
 │   └── test_latency_observability.c
