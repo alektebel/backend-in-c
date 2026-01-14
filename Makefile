@@ -38,6 +38,7 @@ CACHE_STRATEGIES_SRC = $(SRC_DIR)/cache_strategies/cache_strategies.c
 CONCURRENCY_SRC = $(SRC_DIR)/concurrency/concurrency.c
 NETWORK_SERIALIZATION_SRC = $(SRC_DIR)/network_serialization/network_serialization.c
 LATENCY_OBSERVABILITY_SRC = $(SRC_DIR)/latency_observability/latency_observability.c
+TCP_UDP_SRC = $(SRC_DIR)/tcp_udp/tcp_udp.c
 
 ALL_SRC = $(COMMON_SRC) $(HTTP_SRC) $(WEBSERVER_SRC) $(DATABASE_SRC) \
           $(CACHE_SRC) $(MQUEUE_SRC) $(DISTRIBUTED_SRC) $(HTTP_STATUS_SRC) \
@@ -46,7 +47,7 @@ ALL_SRC = $(COMMON_SRC) $(HTTP_SRC) $(WEBSERVER_SRC) $(DATABASE_SRC) \
           $(LOGGING_SRC) $(MONITORING_SRC) $(TRACING_SRC) $(TESTING_SRC) \
           $(CONTAINER_SRC) $(CICD_SRC) $(CLOUD_SRC) $(DB_PERFORMANCE_SRC) \
           $(CACHE_STRATEGIES_SRC) $(CONCURRENCY_SRC) $(NETWORK_SERIALIZATION_SRC) \
-          $(LATENCY_OBSERVABILITY_SRC)
+          $(LATENCY_OBSERVABILITY_SRC) $(TCP_UDP_SRC)
 
 # Object files
 COMMON_OBJ = $(BUILD_DIR)/common.o
@@ -77,6 +78,7 @@ CACHE_STRATEGIES_OBJ = $(BUILD_DIR)/cache_strategies.o
 CONCURRENCY_OBJ = $(BUILD_DIR)/concurrency.o
 NETWORK_SERIALIZATION_OBJ = $(BUILD_DIR)/network_serialization.o
 LATENCY_OBSERVABILITY_OBJ = $(BUILD_DIR)/latency_observability.o
+TCP_UDP_OBJ = $(BUILD_DIR)/tcp_udp.o
 
 ALL_OBJ = $(COMMON_OBJ) $(HTTP_OBJ) $(WEBSERVER_OBJ) $(DATABASE_OBJ) \
           $(CACHE_OBJ) $(MQUEUE_OBJ) $(DISTRIBUTED_OBJ) $(HTTP_STATUS_OBJ) \
@@ -85,7 +87,7 @@ ALL_OBJ = $(COMMON_OBJ) $(HTTP_OBJ) $(WEBSERVER_OBJ) $(DATABASE_OBJ) \
           $(LOGGING_OBJ) $(MONITORING_OBJ) $(TRACING_OBJ) $(TESTING_OBJ) \
           $(CONTAINER_OBJ) $(CICD_OBJ) $(CLOUD_OBJ) $(DB_PERFORMANCE_OBJ) \
           $(CACHE_STRATEGIES_OBJ) $(CONCURRENCY_OBJ) $(NETWORK_SERIALIZATION_OBJ) \
-          $(LATENCY_OBSERVABILITY_OBJ)
+          $(LATENCY_OBSERVABILITY_OBJ) $(TCP_UDP_OBJ)
 
 # Test executables
 TEST_HTTP = $(BUILD_DIR)/test_http
@@ -102,9 +104,10 @@ TEST_CACHE_STRATEGIES = $(BUILD_DIR)/test_cache_strategies
 TEST_CONCURRENCY = $(BUILD_DIR)/test_concurrency
 TEST_NETWORK_SERIALIZATION = $(BUILD_DIR)/test_network_serialization
 TEST_LATENCY_OBSERVABILITY = $(BUILD_DIR)/test_latency_observability
+TEST_TCP_UDP = $(BUILD_DIR)/test_tcp_udp
 
 ALL_TESTS = $(TEST_DB_PERFORMANCE) $(TEST_CACHE_STRATEGIES) $(TEST_CONCURRENCY) \
-            $(TEST_NETWORK_SERIALIZATION) $(TEST_LATENCY_OBSERVABILITY)
+            $(TEST_NETWORK_SERIALIZATION) $(TEST_LATENCY_OBSERVABILITY) $(TEST_TCP_UDP)
 
 # Benchmark executables
 BENCH_HTTP = $(BUILD_DIR)/bench_http
@@ -119,9 +122,10 @@ BENCH_CACHE_STRATEGIES = $(BUILD_DIR)/bench_cache_strategies
 BENCH_CONCURRENCY = $(BUILD_DIR)/bench_concurrency
 BENCH_NETWORK_SERIALIZATION = $(BUILD_DIR)/bench_network_serialization
 BENCH_LATENCY_OBSERVABILITY = $(BUILD_DIR)/bench_latency_observability
+BENCH_TCP_UDP = $(BUILD_DIR)/bench_tcp_udp
 
 ALL_BENCHMARKS = $(BENCH_DB_PERFORMANCE) $(BENCH_CACHE_STRATEGIES) $(BENCH_CONCURRENCY) \
-                 $(BENCH_NETWORK_SERIALIZATION) $(BENCH_LATENCY_OBSERVABILITY)
+                 $(BENCH_NETWORK_SERIALIZATION) $(BENCH_LATENCY_OBSERVABILITY) $(BENCH_TCP_UDP)
 
 .PHONY: all clean test benchmark
 
@@ -217,6 +221,9 @@ $(NETWORK_SERIALIZATION_OBJ): $(NETWORK_SERIALIZATION_SRC) $(INCLUDE_DIR)/networ
 $(LATENCY_OBSERVABILITY_OBJ): $(LATENCY_OBSERVABILITY_SRC) $(INCLUDE_DIR)/latency_observability.h $(INCLUDE_DIR)/common.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(TCP_UDP_OBJ): $(TCP_UDP_SRC) $(INCLUDE_DIR)/tcp_udp.h $(INCLUDE_DIR)/common.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # Build tests - Performance optimization modules
 $(TEST_DB_PERFORMANCE): $(TEST_DIR)/test_db_performance.c $(COMMON_OBJ) $(DB_PERFORMANCE_OBJ)
 	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(DB_PERFORMANCE_OBJ) -o $@ $(LDFLAGS)
@@ -233,6 +240,9 @@ $(TEST_NETWORK_SERIALIZATION): $(TEST_DIR)/test_network_serialization.c $(COMMON
 $(TEST_LATENCY_OBSERVABILITY): $(TEST_DIR)/test_latency_observability.c $(COMMON_OBJ) $(LATENCY_OBSERVABILITY_OBJ)
 	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(LATENCY_OBSERVABILITY_OBJ) -o $@ $(LDFLAGS)
 
+$(TEST_TCP_UDP): $(TEST_DIR)/test_tcp_udp.c $(COMMON_OBJ) $(TCP_UDP_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(TCP_UDP_OBJ) -o $@ $(LDFLAGS)
+
 # Build benchmarks - Performance optimization modules
 $(BENCH_DB_PERFORMANCE): $(BENCH_DIR)/bench_db_performance.c $(COMMON_OBJ) $(DB_PERFORMANCE_OBJ)
 	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(DB_PERFORMANCE_OBJ) -o $@ $(LDFLAGS)
@@ -248,6 +258,9 @@ $(BENCH_NETWORK_SERIALIZATION): $(BENCH_DIR)/bench_network_serialization.c $(COM
 
 $(BENCH_LATENCY_OBSERVABILITY): $(BENCH_DIR)/bench_latency_observability.c $(COMMON_OBJ) $(LATENCY_OBSERVABILITY_OBJ)
 	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(LATENCY_OBSERVABILITY_OBJ) -o $@ $(LDFLAGS)
+
+$(BENCH_TCP_UDP): $(BENCH_DIR)/bench_tcp_udp.c $(COMMON_OBJ) $(TCP_UDP_OBJ)
+	$(CC) $(CFLAGS) $< $(COMMON_OBJ) $(TCP_UDP_OBJ) -o $@ $(LDFLAGS)
 
 # Run tests
 test: $(ALL_TESTS)

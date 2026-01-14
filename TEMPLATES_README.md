@@ -262,6 +262,23 @@ Production observability and latency management:
 **Tests:** `tests/test_latency_observability.c` (7 comprehensive tests)  
 **Benchmarks:** `benchmarks/bench_latency_observability.c` (4 performance benchmarks)
 
+### 22. TCP/IP and UDP Protocols (`tcp_udp.h`)
+Network socket programming based on Beej's Network Programming Guide:
+- **TCP Server/Client**: Socket creation, binding, listening, accepting, connecting
+- **UDP Datagram Sockets**: Connectionless datagram communication, sendto/recvfrom
+- **UDP Connected Mode**: Connected UDP sockets for simplified send/recv
+- **Socket Options**: Non-blocking I/O, SO_REUSEADDR, SO_KEEPALIVE, TCP_NODELAY
+- **Address Resolution**: DNS hostname resolution, getaddrinfo/freeaddrinfo wrappers
+- **Address Conversion**: String to sockaddr and sockaddr to string conversion
+- **Socket Configuration**: Send/receive buffer sizes, timeouts, keep-alive parameters
+- **I/O Multiplexing**: select(), poll(), epoll(), kqueue() abstractions
+- **Event-Driven I/O**: Socket event registration, modification, and waiting
+- **High-Level Utilities**: Echo server/client examples for testing
+- **Error Handling**: Socket error codes and descriptive error messages
+
+**Tests:** `tests/test_tcp_udp.c` (48 comprehensive tests)  
+**Benchmarks:** `benchmarks/bench_tcp_udp.c` (17 performance benchmarks including throughput tests)
+
 ## Building
 
 ### Requirements
@@ -284,6 +301,7 @@ make build/test_cache_strategies
 make build/test_concurrency
 make build/test_network_serialization
 make build/test_latency_observability
+make build/test_tcp_udp
 
 # Build performance optimization module benchmarks
 make build/bench_db_performance
@@ -291,6 +309,7 @@ make build/bench_cache_strategies
 make build/bench_concurrency
 make build/bench_network_serialization
 make build/bench_latency_observability
+make build/bench_tcp_udp
 ```
 
 ## Running Tests
@@ -307,6 +326,7 @@ build/test_cache_strategies
 build/test_concurrency
 build/test_network_serialization
 build/test_latency_observability
+build/test_tcp_udp
 ```
 
 ## Running Benchmarks
@@ -323,6 +343,7 @@ build/bench_cache_strategies
 build/bench_concurrency
 build/bench_network_serialization
 build/bench_latency_observability
+build/bench_tcp_udp
 ```
 
 ## Implementation Status
@@ -363,16 +384,30 @@ backend-in-c/
 │   ├── cache_strategies.h        # NEW: Caching patterns
 │   ├── concurrency.h             # NEW: Concurrency primitives
 │   ├── network_serialization.h   # NEW: Network optimization
-│   └── latency_observability.h   # NEW: Observability & latency
+│   ├── latency_observability.h   # NEW: Observability & latency
+│   └── tcp_udp.h                 # NEW: TCP/IP and UDP protocols
 ├── src/                  # Stub implementations
 │   ├── db_performance/
 │   ├── cache_strategies/
 │   ├── concurrency/
 │   ├── network_serialization/
-│   └── latency_observability/
+│   ├── latency_observability/
+│   └── tcp_udp/
 ├── tests/                # Test suites
 │   ├── test_db_performance.c
 │   ├── test_cache_strategies.c
+│   ├── test_concurrency.c
+│   ├── test_network_serialization.c
+│   ├── test_latency_observability.c
+│   └── test_tcp_udp.c
+└── benchmarks/           # Performance benchmarks
+    ├── bench_db_performance.c
+    ├── bench_cache_strategies.c
+    ├── bench_concurrency.c
+    ├── bench_network_serialization.c
+    ├── bench_latency_observability.c
+    └── bench_tcp_udp.c
+```
 │   ├── test_concurrency.c
 │   ├── test_network_serialization.c
 │   └── test_latency_observability.c
